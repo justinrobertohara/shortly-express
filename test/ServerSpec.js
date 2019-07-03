@@ -14,12 +14,10 @@ var Link = require('../app/models/link');
 // Remove the 'x' from beforeEach block when working on
 // authentication tests.
 /************************************************************/
-var xbeforeEach = function() {};
+var beforeEach = function() {};
 /************************************************************/
 
-
 describe('', function() {
-
   var server;
 
   before(function() {
@@ -73,37 +71,38 @@ describe('', function() {
   });
 
   describe('Link creation:', function() {
+    var requestWithSession = request.defaults({ jar: true });
 
-    var requestWithSession = request.defaults({jar: true});
-
-    xbeforeEach(function(done) {
+    beforeEach(function(done) {
       // create a user that we can then log-in with
       new User({
-        'username': 'Phillip',
-        'password': 'Phillip'
-      }).save().then(function() {
-        var options = {
-          'method': 'POST',
-          'followAllRedirects': true,
-          'uri': 'http://127.0.0.1:4568/login',
-          'json': {
-            'username': 'Phillip',
-            'password': 'Phillip'
-          }
-        };
-        // login via form and save session info
-        requestWithSession(options, function(error, res, body) {
-          done();
+        username: 'Phillip',
+        password: 'Phillip'
+      })
+        .save()
+        .then(function() {
+          var options = {
+            method: 'POST',
+            followAllRedirects: true,
+            uri: 'http://127.0.0.1:4568/login',
+            json: {
+              username: 'Phillip',
+              password: 'Phillip'
+            }
+          };
+          // login via form and save session info
+          requestWithSession(options, function(error, res, body) {
+            done();
+          });
         });
-      });
     });
 
     it('Only shortens valid urls, returning a 404 - Not found for invalid urls', function(done) {
       var options = {
-        'method': 'POST',
-        'uri': 'http://127.0.0.1:4568/links',
-        'json': {
-          'url': 'definitely not a valid url'
+        method: 'POST',
+        uri: 'http://127.0.0.1:4568/links',
+        json: {
+          url: 'definitely not a valid url'
         }
       };
 
@@ -115,13 +114,12 @@ describe('', function() {
     });
 
     describe('Shortening links:', function() {
-
       var options = {
-        'method': 'POST',
-        'followAllRedirects': true,
-        'uri': 'http://127.0.0.1:4568/links',
-        'json': {
-          'url': 'http://roflzoo.com/'
+        method: 'POST',
+        followAllRedirects: true,
+        uri: 'http://127.0.0.1:4568/links',
+        json: {
+          url: 'http://roflzoo.com/'
         }
       };
 
@@ -147,24 +145,28 @@ describe('', function() {
         });
       });
 
-      it('Fetches the link url title', function (done) {
+      it('Fetches the link url title', function(done) {
         requestWithSession(options, function(error, res, body) {
           db.knex('urls')
-            .where('title', '=', 'Funny pictures of animals, funny dog pictures')
+            .where(
+              'title',
+              '=',
+              'Funny pictures of animals, funny dog pictures'
+            )
             .then(function(urls) {
               if (urls['0'] && urls['0']['title']) {
                 var foundTitle = urls['0']['title'];
               }
-              expect(foundTitle).to.equal('Funny pictures of animals, funny dog pictures');
+              expect(foundTitle).to.equal(
+                'Funny pictures of animals, funny dog pictures'
+              );
               done();
             });
         });
       });
-
     }); // 'Shortening links'
 
     describe('With previously saved urls:', function() {
-
       var link;
 
       beforeEach(function(done) {
@@ -181,16 +183,21 @@ describe('', function() {
 
       it('Returns the same shortened code', function(done) {
         var options = {
-          'method': 'POST',
-          'followAllRedirects': true,
-          'uri': 'http://127.0.0.1:4568/links',
-          'json': {
-            'url': 'http://roflzoo.com/'
+          method: 'POST',
+          followAllRedirects: true,
+          uri: 'http://127.0.0.1:4568/links',
+          json: {
+            url: 'http://roflzoo.com/'
           }
         };
 
         requestWithSession(options, function(error, res, body) {
           var code = res.body.code;
+          // console.log('this is our options', options)
+          // console.log('this is our code?',code)
+          // console.log('this is our body', body)
+          console.log('this is our link', link);
+
           expect(code).to.equal(link.get('code'));
           done();
         });
@@ -198,8 +205,8 @@ describe('', function() {
 
       it('Shortcode redirects to correct url', function(done) {
         var options = {
-          'method': 'GET',
-          'uri': 'http://127.0.0.1:4568/' + link.get('code')
+          method: 'GET',
+          uri: 'http://127.0.0.1:4568/' + link.get('code')
         };
 
         requestWithSession(options, function(error, res, body) {
@@ -211,23 +218,22 @@ describe('', function() {
 
       it('Returns all of the links to display on the links page', function(done) {
         var options = {
-          'method': 'GET',
-          'uri': 'http://127.0.0.1:4568/links'
+          method: 'GET',
+          uri: 'http://127.0.0.1:4568/links'
         };
 
         requestWithSession(options, function(error, res, body) {
-          expect(body).to.include('"title":"Funny pictures of animals, funny dog pictures"');
+          expect(body).to.include(
+            '"title":"Funny pictures of animals, funny dog pictures"'
+          );
           expect(body).to.include('"code":"' + link.get('code') + '"');
           done();
         });
       });
-
     }); // 'With previously saved urls'
-
   }); // 'Link creation'
 
-  xdescribe('Privileged Access:', function() {
-
+  describe('Privileged Access:', function() {
     it('Redirects to login page if a user tries to access the main page and is not signed in', function(done) {
       request('http://127.0.0.1:4568/', function(error, res, body) {
         expect(res.req.path).to.equal('/login');
@@ -248,18 +254,16 @@ describe('', function() {
         done();
       });
     });
-
   }); // 'Priviledged Access'
 
-  xdescribe('Account Creation:', function() {
-
+  describe('Account Creation:', function() {
     it('Signup creates a user record', function(done) {
       var options = {
-        'method': 'POST',
-        'uri': 'http://127.0.0.1:4568/signup',
-        'json': {
-          'username': 'Svnh',
-          'password': 'Svnh'
+        method: 'POST',
+        uri: 'http://127.0.0.1:4568/signup',
+        json: {
+          username: 'Svnh',
+          password: 'Svnh'
         }
       };
 
@@ -272,7 +276,8 @@ describe('', function() {
             }
             expect(user).to.equal('Svnh');
             done();
-          }).catch(function(err) {
+          })
+          .catch(function(err) {
             throw {
               type: 'DatabaseError',
               message: 'Failed to create test setup data'
@@ -283,11 +288,11 @@ describe('', function() {
 
     it('Signup logs in a new user', function(done) {
       var options = {
-        'method': 'POST',
-        'uri': 'http://127.0.0.1:4568/signup',
-        'json': {
-          'username': 'Phillip',
-          'password': 'Phillip'
+        method: 'POST',
+        uri: 'http://127.0.0.1:4568/signup',
+        json: {
+          username: 'Phillip',
+          password: 'Phillip'
         }
       };
 
@@ -296,29 +301,29 @@ describe('', function() {
         done();
       });
     });
-
   }); // 'Account Creation'
 
-  xdescribe('Account Login:', function() {
-
-    var requestWithSession = request.defaults({jar: true});
+  describe('Account Login:', function() {
+    var requestWithSession = request.defaults({ jar: true });
 
     beforeEach(function(done) {
       new User({
-        'username': 'Phillip',
-        'password': 'Phillip'
-      }).save().then(function() {
-        done();
-      });
+        username: 'Phillip',
+        password: 'Phillip'
+      })
+        .save()
+        .then(function() {
+          done();
+        });
     });
 
     it('Logs in existing users', function(done) {
       var options = {
-        'method': 'POST',
-        'uri': 'http://127.0.0.1:4568/login',
-        'json': {
-          'username': 'Phillip',
-          'password': 'Phillip'
+        method: 'POST',
+        uri: 'http://127.0.0.1:4568/login',
+        json: {
+          username: 'Phillip',
+          password: 'Phillip'
         }
       };
 
@@ -330,11 +335,11 @@ describe('', function() {
 
     it('Users that do not exist are kept on login page', function(done) {
       var options = {
-        'method': 'POST',
-        'uri': 'http://127.0.0.1:4568/login',
-        'json': {
-          'username': 'Fred',
-          'password': 'Fred'
+        method: 'POST',
+        uri: 'http://127.0.0.1:4568/login',
+        json: {
+          username: 'Fred',
+          password: 'Fred'
         }
       };
 
@@ -343,7 +348,5 @@ describe('', function() {
         done();
       });
     });
-
   }); // 'Account Login'
-
 });
