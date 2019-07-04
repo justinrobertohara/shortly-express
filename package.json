@@ -19,15 +19,16 @@
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "bluebird": "^3.3.4",
-    "body-parser": "^1.15.0",
+    "body-parser": "^1.19.0",
     "bookshelf": "^0.9.1",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
     "express-partials": "^0.3.0",
-    "express-session": "^1.13.0",
+    "express-session": "^1.16.2",
     "knex": "^0.10.0",
     "nodemon": "^1.19.1",
     "request": "^2.34.0",
+    "session": "^0.1.0",
     "sqlite3": "^4.0.9"
   },
   "devDependencies": {

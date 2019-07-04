@@ -51,10 +51,10 @@ describe('', function() {
       .del()
       .catch(function(error) {
         // uncomment when writing authentication tests
-        // throw {
-        //   type: 'DatabaseError',
-        //   message: 'Failed to create test setup data'
-        // };
+        throw {
+          type: 'DatabaseError',
+          message: 'Failed to create test setup data'
+        };
       });
 
     // delete user Phillip from db so it can be created later for the test
@@ -63,10 +63,10 @@ describe('', function() {
       .del()
       .catch(function(error) {
         // uncomment when writing authentication tests
-        // throw {
-        //   type: 'DatabaseError',
-        //   message: 'Failed to create test setup data'
-        // };
+        throw {
+          type: 'DatabaseError',
+          message: 'Failed to create test setup data'
+        };
       });
   });
 
@@ -194,9 +194,10 @@ describe('', function() {
         requestWithSession(options, function(error, res, body) {
           var code = res.body.code;
           // console.log('this is our options', options)
-          // console.log('this is our code?',code)
-          // console.log('this is our body', body)
-          console.log('this is our link', link);
+          console.log('this is our code?', code);
+          console.log('this is our body', body)
+          console.log('this is our options', options);
+
 
           expect(code).to.equal(link.get('code'));
           done();

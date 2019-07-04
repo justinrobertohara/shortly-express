@@ -17,10 +17,11 @@ var Link = db.Model.extend({
       shasum.update(model.get('url'));
       model.set('code', shasum.digest('hex').slice(0, 5));
     });
-  },
-  get: function(req, res) {
-    console.log('this is our res',res);
   }
+  // ,
+  // get: function(req, res) {
+  //   console.log('this is our res',res);
+  // }
 });
 
 module.exports = Link;

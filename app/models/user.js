@@ -1,22 +1,18 @@
 var db = require('../config');
 var bcrypt = require('bcrypt-nodejs');
 var Promise = require('bluebird');
-var bodyParser = require('bodyParser');
-var express = require('express');
 
-var app = express();
-app.use(express.bodyParser());
-app.use(express.cookieParser('here is our string'))
+// var express = require('express');
 
-// console.log('this is our app in user.js******', app);
+//bookshelf.js
+//https://bookshelfjs.org/
 
-
-//Allow users to register for a new account, or to login
-//Build pages for login and sign up
-//And add routes to process the form data using POST actions.
+//User var takes in users database which contains access to usernames and passwords
 
 var User = db.Model.extend({
-
+  tableName: 'users',
+  // our table creates time stamps, hasTs returns an array of created at and udpated at values
+  hasTimestamps: true
 });
 
 module.exports = User;
