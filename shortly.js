@@ -91,10 +91,10 @@ app.post('/signup', (req, res) => {
   var pw = req.body.password;
 
   new User({ username: user, password: pw }).fetch().then(success => {
-    if (success) {
-      req
-    } else {
-    }
+    // if (success) {
+    //   req
+    // } else {
+    // }
   });
 });
 
