@@ -31,7 +31,16 @@ app.use(
   })
 );
 
-app.get('/', function(req, res) {
+/* create checkUser fn, pass into all server routes that require login */
+
+const checkUser = (req, res, next) => {
+  if (req.username) {
+    next();
+  }
+  res.redirect('/signup');
+};
+
+app.get('/', checkUser, function(req, res) {
   res.render('index');
 });
 
@@ -93,9 +102,9 @@ app.post('/signup', (req, res) => {
 
   Users.create({ username: usernameReq, password: passwordReq })
     .then(() => {
-      res.status(202).end();
-      console.log('we have successfully done something');
-      res.redirect('/');
+      res.status(202);
+      console.log(`we have successfully created a new user ${usernameReq} with the password ${passwordReq}`);
+      res.render('index');
     })
     .catch(err => {
       console.log(err);
@@ -103,30 +112,33 @@ app.post('/signup', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-  res.render('login');
+  console.log('Successful Login');
+  res.render('index');
 });
 
 app.post('/login', (req, res) => {
   var usernameReq = req.body.username;
   var pwReq = req.body.password;
 
-  db.knex.select('username', 'password').from('users').where({
-    username: usernameReq,
-    password: pwReq
-  })
-  .then(data => {
-    req.session.regenerate(() => {
-      req.session.username = usernameReq;
-      res.redirect('/');
+  db.knex
+    .select('username', 'password')
+    .from('users')
+    .where({
+      username: usernameReq,
+      password: pwReq
     })
-  })
-  .catch(err => {
-    if (err) {
-      res.redirect('/signup');
-    }
-  })
-
-
+    .then(data => {
+      req.session.regenerate(() => {
+        req.session.username = usernameReq;
+        res.redirect('/');
+      });
+    })
+    .catch(err => {
+      if (err) {
+        console.log(err);
+        res.redirect('/signup');
+      }
+    });
 });
 
 /************************************************************/
