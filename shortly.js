@@ -33,7 +33,6 @@ app.use(
 
 app.get('/', function(req, res) {
   res.render('index');
-  console.log('we have logged into the index');
 });
 
 app.get('/create', function(req, res) {
@@ -83,44 +82,51 @@ app.post('/links', function(req, res) {
 /************************************************************/
 /* build pages for login and sign up, and add routes to process the form data using POST actions. */
 app.get('/signup', (req, res) => {
+  res.status(200);
   res.render('signup');
 });
 
 app.post('/signup', (req, res) => {
-  var user = req.body.username;
-  var pw = req.body.password;
+  var usernameReq = req.body.username;
+  var passwordReq = req.body.password;
+  console.log('*******req.body ', req.body);
 
-  new User({ username: user, password: pw }).fetch().then(success => {
-    // if (success) {
-    //   req
-    // } else {
-    // }
-  });
+  Users.create({ username: usernameReq, password: passwordReq })
+    .then(() => {
+      res.status(202).end();
+      console.log('we have successfully done something');
+      res.redirect('/');
+    })
+    .catch(err => {
+      console.log(err);
+    });
 });
-
-// app.post('/signup', (req, res) => {
-//   db.knex('users').insert({
-//     username: req.body.username,
-//     password: req.body.password
-//   }).then((data) => {
-//     res.status(200);
-//     req.session.regenerate(() => {
-//       request.session.user = req.body.username;
-//       res.redirect('/');
-//     })
-//   }).catch((err) => {
-//     res.send('Error, try again: ', err);
-//     res.status(404);
-//   })
-// });
 
 app.get('/login', (req, res) => {
   res.render('login');
 });
 
 app.post('/login', (req, res) => {
-  var username = req.body.username;
-  var pw = req.body.password;
+  var usernameReq = req.body.username;
+  var pwReq = req.body.password;
+
+  db.knex.select('username', 'password').from('users').where({
+    username: usernameReq,
+    password: pwReq
+  })
+  .then(data => {
+    req.session.regenerate(() => {
+      req.session.username = usernameReq;
+      res.redirect('/');
+    })
+  })
+  .catch(err => {
+    if (err) {
+      res.redirect('/signup');
+    }
+  })
+
+
 });
 
 /************************************************************/
